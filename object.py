@@ -38,12 +38,15 @@ class ObjectDetector(VideoTransformerBase):
 
 st.title("Live Object Detection with Webcam")
 
-webrtc_streamer(
-    key="live",
-    video_transformer_factory=ObjectDetector,
-    rtc_configuration={
-        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-    },
-    media_stream_constraints={"video": True, "audio": False},
-    async_processing=True
-)
+try:
+    webrtc_streamer(
+        key="live",
+        video_transformer_factory=ObjectDetector,
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={"video": True, "audio": False},
+        async_processing=True
+    )
+except Exception as e:
+    st.error(f"An error occurred while setting up the WebRTC streamer: {e}")
