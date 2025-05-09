@@ -18,7 +18,7 @@ class ObjectDetector(VideoTransformerBase):
 
         blob = cv2.dnn.blobFromImage(cv2.resize(img, (300, 300)),
                                      0.007843, (300, 300), 127.5)
-        
+
         net.setInput(blob)
         detections = net.forward()
 
@@ -26,7 +26,7 @@ class ObjectDetector(VideoTransformerBase):
             confidence = detections[0, 0, i, 2]
             if confidence > 0.5:
                 idx = int(detections[0, 0, i, 1])
-                box = detections[0, 0, i, 3:7] * [w, h, w, h]
+                box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
                 (startX, startY, endX, endY) = box.astype("int")
 
                 label = CLASSES[idx]
@@ -38,4 +38,12 @@ class ObjectDetector(VideoTransformerBase):
 
 st.title("Live Object Detection with Webcam")
 
-webrtc_streamer(key="live", video_transformer_factory=ObjectDetector)
+webrtc_streamer(
+    key="live",
+    video_transformer_factory=ObjectDetector,
+    rtc_configuration={
+        "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+    },
+    media_stream_constraints={"video": True, "audio": False},
+    async_processing=True
+)
